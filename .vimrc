@@ -165,6 +165,7 @@ nmap <Leader>C :ClangFormatAutoToggle<CR>
 nmap <F8> :TagbarToggle<CR>
 
 map <F2> :NERDTreeToggle<CR>
+<<<<<<< HEAD
 
 
 "syntastic
