@@ -5,6 +5,10 @@
 "
 " create symbolic link to neovim
 " ln -s ~/.vimrc ~/.config/nvim/init.vim
+" usage:
+" <f8> toggle colorschemes
+" <f3> paste toggle
+" <f6> nerdtree toggle
 
 let mapleader = ","
 
@@ -12,6 +16,8 @@ let mapleader = ","
 set enc=utf-8
 set fenc=utf-8
 set termencoding=utf-8
+"for console color capability
+set t_Co=256
 
 " disable vi compatibility
 set nocompatible
@@ -64,7 +70,7 @@ Plug 'kien/ctrlp.vim'
 Plug 'wesleyche/SrcExpl'
 "Learn sometime else
 Plug 'vim-scripts/Conque-GDB'
-"Plug 'neoclide/coc'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'scrooloose/syntastic'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'vim-scripts/cscope.vim'
@@ -144,13 +150,9 @@ nmap <Leader>C :ClangFormatAutoToggle<CR>
 "Toggle tagbar
 nmap <F8> :TagbarToggle<CR>
 
-
-
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
-
-
 set wildignore+=*.o,*.out,*.obj
 set wildignore+=*.dll,*.exe
 set wildignore+=*.pyc,*.pyo
@@ -204,3 +206,228 @@ while c <= 99
   execute "nnoremap " . c . "gb :" . c . "b\<CR>"
   let c += 1
 endwhile
+
+"vim autocomplete
+autocmd FileType vim let b:vcm_tab_complete = 'vim'
+  "mappings
+  imap jk <esc>
+noremap <Leader>y "*y
+noremap <Leader>p "*p
+noremap <Leader>Y "+y
+noremap <Leader>P "+p`
+
+"neococ
+" if hidden is not set, TextEdit might fail.
+set hidden
+
+" Some servers have issues with backup files, see #649
+set nobackup
+set nowritebackup
+
+" Better display for messages
+set cmdheight=2
+
+" You will have bad experience for diagnostic messages when it's default 4000.
+set updatetime=300
+
+" don't give |ins-completion-menu| messages.
+set shortmess+=c
+
+" always show signcolumns
+set signcolumn=yes
+
+" Use tab for trigger completion with characters ahead and navigate.
+" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
+" Coc only does snippet and additional edit on confirm.
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" Or use `complete_info` if your vim support it, like:
+" inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Remap for format selected region
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap for do codeAction of current line
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Fix autofix problem of current line
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" create mappings for function text object, requires document symbols feature of languageserver.
+xmap if <plug>(coc-funcobj-i)
+xmap af <plug>(coc-funcobj-a)
+omap if <plug>(coc-funcobj-i)
+omap af <plug>(coc-funcobj-a)
+
+" use <tab> for select selections ranges, needs server support, like: coc-tsserver, coc-python
+nmap <silent> <tab> <plug>(coc-range-select)
+xmap <silent> <tab> <plug>(coc-range-select)
+
+"" use `:format` to format current buffer
+"command! -nargs=0 format :call cocaction('format')
+
+" use `:fold` to fold current buffer
+"command! -nargs=? fold :call     cocaction('fold', <f-args>)
+
+" use `:or` for organize import of current buffer
+"command! -nargs=0 or   :call     cocaction('runcommand', 'editor.action.organizeimport')
+
+" add status line support, for integration with other plugin, checkout `:h coc-status`
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+" change the color scheme from a list of color scheme names.
+" version 2010-09-12 from http://vim.wikia.com/wiki/vimtip341
+" press key:
+"   f8                next scheme
+"   shift-f8          previous scheme
+"   alt-f8            random scheme
+" set the list of color schemes used by the above (default is 'all'):
+"   :setcolors all              (all $vimruntime/colors/*.vim)
+"   :setcolors my               (names built into script)
+"   :setcolors blue slate ron   (these schemes)
+"   :setcolors                  (display current scheme names)
+" set the current color scheme based on time of day:
+"   :setcolors now
+if v:version < 700 || exists('loaded_setcolors') || &cp
+  finish
+endif
+
+let loaded_setcolors = 1
+let s:mycolors = ['peachpuff', 'delek', 'badwolf']  " colorscheme names that we use to set color
+
+" set list of color scheme names that we will use, except
+" argument 'now' actually changes the current color scheme.
+function! s:setcolors(args)
+  if len(a:args) == 0
+    echo 'current color scheme names:'
+    let i = 0
+    while i < len(s:mycolors)
+      echo '  '.join(map(s:mycolors[i : i+4], 'printf("%-14s", v:val)'))
+      let i += 5
+    endwhile
+  elseif a:args == 'all'
+    let paths = split(globpath(&runtimepath, 'colors/*.vim'), "\n")
+    let s:mycolors = uniq(sort(map(paths, 'fnamemodify(v:val, ":t:r")')))
+    echo 'list of colors set from all installed color schemes'
+  elseif a:args == 'my'
+    let c1 = 'default elflord peachpuff desert256 breeze morning'
+    let c2 = 'darkblue gothic aqua earth black_angus relaxedgreen'
+    let c3 = 'darkblack freya motus impact less chocolateliquor'
+    let s:mycolors = split(c1.' '.c2.' '.c3)
+    echo 'list of colors set from built-in names'
+  elseif a:args == 'now'
+    call s:hourcolor()
+  else
+    let s:mycolors = split(a:args)
+    echo 'list of colors set from argument (space-separated names)'
+  endif
+endfunction
+
+command! -nargs=* setcolors call s:setcolors('<args>')
+
+" set next/previous/random (how = 1/-1/0) color from our list of colors.
+" the 'random' index is actually set from the current time in seconds.
+" global (no 's:') so can easily call from command line.
+function! nextcolor(how)
+  call s:nextcolor(a:how, 1)
+endfunction
+
+" helper function for nextcolor(), allows echoing of the color name to be
+" disabled.
+function! s:nextcolor(how, echo_color)
+  if len(s:mycolors) == 0
+    call s:setcolors('all')
+  endif
+  if exists('g:colors_name')
+    let current = index(s:mycolors, g:colors_name)
+  else
+    let current = -1
+  endif
+  let missing = []
+  let how = a:how
+  for i in range(len(s:mycolors))
+    if how == 0
+      let current = localtime() % len(s:mycolors)
+      let how = 1  " in case random color does not exist
+    else
+      let current += how
+      if !(0 <= current && current < len(s:mycolors))
+        let current = (how>0 ? 0 : len(s:mycolors)-1)
+      endif
+    endif
+    try
+      execute 'colorscheme '.s:mycolors[current]
+      break
+    catch /e185:/
+      call add(missing, s:mycolors[current])
+    endtry
+  endfor
+  redraw
+  if len(missing) > 0
+    echo 'error: colorscheme not found:' join(missing)
+  endif
+  if (a:echo_color)
+    echo g:colors_name
+  endif
+endfunction
+
+nnoremap <f8> :call nextcolor(1)<cr>
+nnoremap <s-f8> :call nextcolor(-1)<cr>
+nnoremap <a-f8> :call nextcolor(0)<cr>
+endfunction
+
+"mappings
+imap jk <esc>
