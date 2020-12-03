@@ -1,0 +1,33 @@
+Found 48 jobs
+Found 7 distinct failure reasons
+Failure: Command failed on smithi066 with status 1: 'sudo docker kill -s 1 ceph-807421fa-3441-11eb-980d-001a4aab830c-osd.7'
+3 jobs: ['5671768', '5671763', '5671776']
+suites intersection: []
+suites union: ['1-install/luminous', '1-install/nautilus-v1only', '2-repo_digest/repo_digest', '3-start-upgrade', '4-wait', 'backoff/normal', 'backoff/peering_and_degraded',
+
+Failure: Command failed (workunit test cephadm/test_cephadm.sh) on smithi073 with status 1: 'mkdir -p -- /home/ubuntu/cephtest/mnt.0/client.0/tmp && cd -- /home/ubuntu/cepht
+1 jobs: ['5671785']
+suites: ['mon_election/connectivity', 'rados:cephadm/workunits/{distro/centos_latest', 'task/test_cephadm}']
+
+Timeout 3h running clone.client.0/qa/workunits/rados/test.sh
+4 jobs: ['5671797', '5671799', '5671803', '5671795']
+suites intersection: ['fixed-2', 'mode/root', 'mon_election/connectivity', 'start', 'tasks/rados_api_tests}']
+suites union: ['fixed-2', 'mode/root', 'mon_election/connectivity', 'msgr/async', 'msgr/async-v1only', 'msgr/async-v2only', 'rados:cephadm/with-work/{distro/centos_8.0', 'ra
+
+Dead: b'2020-12-02T13:41:13.369 DEBUG:teuthology.exit:Finished running handlers'
+3 jobs: ['5671772', '5671767', '5671765']
+suites intersection: ['ceph', 'clusters/{openstack', 'distro$/{ubuntu_18.04}', 'rados', 'thrashosds-health', 'three-plus-one}']
+suites union: ['1-install/luminous-v1only', '1-install/nautilus', '1-install/nautilus-v2only', 'backoff/normal', 'backoff/peering', 'backoff/peering_and_degraded', 'ceph', '
+
+Failure: Test failure: test_cluster_info (tasks.cephfs.test_nfs.TestNFS)
+1 jobs: ['5671781']
+suites: ['mon_election/classic', 'rados:cephadm/workunits/{distro/ubuntu_18.04_podman', 'task/test_orch_cli}']
+
+Failure: psutil.NoSuchProcess process no longer exists (pid=23417)
+1 jobs: ['5671770']
+suites: ['1-install/mimic', 'backoff/peering', 'ceph', 'clusters/{openstack', 'd-balancer/on', 'distro$/{ubuntu_18.04}', 'mon_election/connectivity', 'msgr-failures/few', 'r
+
+Failure: Command failed (workunit test cephadm/test_adoption.sh) on smithi142 with status 1: 'mkdir -p -- /home/ubuntu/cephtest/mnt.0/client.0/tmp && cd -- /home/ubuntu/ceph
+1 jobs: ['5671784']
+suites: ['mon_election/classic', 'rados:cephadm/workunits/{distro/ubuntu_18.04_podman', 'task/test_adoption}']
+
