@@ -1,0 +1,22 @@
+FROM ubuntu:18.04
+LABEL maintainer="dupadhya@redhat.com"
+
+# general utilities
+RUN apt-get update && apt-get install -y \
+    bash vim git wget curl zsh
+RUN apt-get install -y apt-utils gcc make cmake \
+    software-properties-common sudo gdb
+
+# jaeger-dependencies
+RUN apt-get install -y apt-utils libyaml-cpp-dev libgtest-dev \
+    nlohmann-json-dev libboost-dev libboost-test-dev \
+    libboost-program-options-dev libboost-filesystem-dev \
+    libboost-thread-dev libevent-dev automake libtool flex \
+    bison pkg-config g++ libssl-dev nlohmann-json-dev \
+    python3-setuptools
+
+RUN git clone https://github.com/ideepika/ceph.git && cd ceph \
+    && git remote add ci https://github.com/ceph/ceph-ci.git \
+    && git checkout wip-jaeger-static \
+    && ./install-deps.sh 
+
