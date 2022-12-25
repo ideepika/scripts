@@ -44,6 +44,7 @@ sudo dnf install -y containerd.io
 sudo mkdir -p /etc/containerd
 sudo containerd config default | sudo tee /etc/containerd/config.toml
 sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+sudo systemctl enable containerd
 sudo systemctl restart containerd
 
 cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
@@ -62,17 +63,15 @@ sudo systemctl enable --now kubelet
 # k8s cluster deploy
 kubeadm init --apiserver-advertise-address=$(hostname -I | awk '{print $1}') --pod-network-cidr=10.244.0.0/16
 # TODO: fix this, deploy network utility for k8s
-helm repo add cilium https://helm.cilium.io/; helm install cilium cilium/cilium --version 1.12.4 \
-  --namespace kube-system
-#restart unmanaged pods
-kubectl get pods --all-namespaces -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,HOSTNETWORK:.spec.hostNetwork --no-headers=true | grep '<none>' | awk '{print "-n "$1" "$2}' | xargs -L 1 -r kubectl delete pod
-
-
 # kubernetes cluster setup
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
+sleep 3
+helm repo add cilium https://helm.cilium.io/; helm install cilium cilium/cilium --version 1.12.4 \
+  --namespace kube-system
+#restart unmanaged pods
+kubectl get pods --all-namespaces -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name,HOSTNETWORK:.spec.hostNetwork --no-headers=true | grep '<none>' | awk '{print "-n "$1" "$2}' | xargs -L 1 -r kubectl delete pod
 
 # for rook cluster setup
 git clone https://github.com/rook/rook.git
@@ -84,6 +83,22 @@ sudo yum install -y lvm2
 git clone --single-branch --branch master https://github.com/rook/rook.git
 cd rook &&  find . -type f -exec sed -i 's/quay\.io\/ceph\/ceph:v17.2.3/koorinc\/koor\-ceph\-container:v17\.2\.3\-20220805/g' {} \;
 cd deploy/examples
-kubectl create -f crds.yaml -f common.yaml -f operator.yaml -f cluster.yaml -f toolbox.yaml
+kubectl create -f crds.yaml -f common.yaml -f operator.yaml
+kubectl create -f cluster.yaml
+kubectl create -f toolbox.yaml
 watch kubectl -n rook-ceph get pod
 
+# for better ceph cluster debugging install krew
+# check https://github.com/rook/kubectl-rook-ceph
+(
+  set -x; cd "$(mktemp -d)" &&
+  OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+  ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+  KREW="krew-${OS}_${ARCH}" &&
+  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+  tar zxvf "${KREW}.tar.gz" &&
+  ./"${KREW}" install krew
+)
+sudo dnf install -y jq
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+kubectl krew install rook-ceph

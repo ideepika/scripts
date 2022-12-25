@@ -7,7 +7,7 @@ minikube ssh "sudo mkdir -p /mnt/vda1/var/lib/rook;sudo ln -s /mnt/vda1/var/lib/
 
 #adding a disk
 sudo -S qemu-img create -f raw /var/lib/libvirt/images/minikube-box-vm-disk-100G 100G
-virsh -c qemu:///system attach-disk minikube --source /var/lib/libvirt/images/minikube-box-vm-disk-90G --target vdb --cache none
+virsh -c qemu:///system attach-disk minikube --source /var/lib/libvirt/images/minikube-box-vm-disk-100G --target vdb --cache none
 virsh -c qemu:///system reboot --domain minikube
 
 sleep 5
