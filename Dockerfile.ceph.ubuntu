@@ -1,0 +1,15 @@
+FROM ubuntu:24.04
+LABEL maintainer="deepikaupadhyay01@gmail.com"
+
+# general utilities
+RUN apt-get update && apt-get install -y \
+    bash vim git wget curl zsh
+RUN apt-get install -y apt-utils gcc ninja-build cmake \
+    software-properties-common sudo gdb
+
+RUN git clone https://github.com/ceph/ceph.git && cd ceph \
+    && git remote add ci https://github.com/ceph/ceph-ci.git \
+    && git remote add ideepika https://github.com/ideepika/ceph.git \
+    && git checkout main\
+    && ./install-deps.sh 
+
